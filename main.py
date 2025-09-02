@@ -50,17 +50,18 @@ def main():
     assert len(sys.argv) == 2, "Need argument for image [ python main.py <image_path> ]."
 
     image_path = pathlib.Path(sys.argv[1]).expanduser().absolute()
-    image = Image.open(image_path).convert("RGB")
+    image = Image.open(image_path).convert("RGB").resize((400, 200))
     image = np.array(image)
 
-
     light = luminance(image)
-    light *= (10 - 10e-6)
-    light = np.floor(light).astype(np.int32)
     lines = line(light)
-    
 
-    out = np.vectorize(LetterPixel.get)(light)
+    final = light + lines
+    final = np.clip(final, max=1.0)
+    final *= (10 - 10e-6)
+    final = np.floor(final).astype(np.int32)
+
+    out = np.vectorize(LetterPixel.get)(final)
 
     art = ""
     for row in out:
