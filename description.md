@@ -1,0 +1,2 @@
+# image_to_letters
+This project should be able to convert image to a cool letter representation.

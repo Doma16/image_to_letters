@@ -4,7 +4,8 @@ import pathlib
 from scipy.signal import convolve2d
 import numpy as np
 from PIL import Image
-import matplotlib.pyplot as plt
+
+RESIZE = True
 
 class LetterPixel:
     LETTER_DENSE = ".,-~:;=*#@"
@@ -50,7 +51,9 @@ def main():
     assert len(sys.argv) == 2, "Need argument for image [ python main.py <image_path> ]."
 
     image_path = pathlib.Path(sys.argv[1]).expanduser().absolute()
-    image = Image.open(image_path).convert("RGB").resize((400, 200))
+    image = Image.open(image_path).convert("RGB")
+    if RESIZE:
+        image = image.resize((67, 32))
     image = np.array(image)
 
     light = luminance(image)
@@ -63,12 +66,14 @@ def main():
 
     out = np.vectorize(LetterPixel.get)(final)
 
-    art = ""
+    art = "```\n"
     for row in out:
         art += "".join(row) + "\n"
-    
-    with open("output.txt", "w") as f:
-        f.write(art)
+    art += "```\n"
+
+    with open("README.md", "w") as f:
+        with open("description.md", "r") as ff:
+            f.write(ff.read() + "\n" * 10 + art)
 
 if __name__ == "__main__":
     main()
