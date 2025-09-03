@@ -2,12 +2,14 @@
 This project should be able to convert image to a cool letter representation.
 
 
-
-
-
-
 <img src="smile.jpg"></img>
 <img src="out.png"></img>
+
+
+
+
+
+
 
 
 
