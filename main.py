@@ -5,7 +5,11 @@ from scipy.signal import convolve2d
 import numpy as np
 from PIL import Image
 
-RESIZE = True
+from visualizer import Visualizer
+
+RESIZE = False
+FONTSIZE = 10
+LUMINANCE_FACTOR = 1.5
 
 class LetterPixel:
     LETTER_DENSE = ".,-~:;=*#@"
@@ -20,7 +24,15 @@ def luminance(arr: np.ndarray) -> np.ndarray:
     rgb = np.array([0.2126, 0.7152, 0.0722])
     light = (arr * rgb).sum(-1)
     light = (light - light.min()) / (light.max() - light.min())
-    return light
+
+    h, w = light.shape
+    light = light.reshape(h // FONTSIZE, FONTSIZE, w // FONTSIZE, FONTSIZE)
+    light = light.mean(axis=(1, 3)) * LUMINANCE_FACTOR
+    
+    colors = arr.reshape(h // FONTSIZE, FONTSIZE, w // FONTSIZE, FONTSIZE, 3)
+    colors = np.round(colors.mean(axis=(1, 3))).astype(np.uint8)
+
+    return light, colors
 
 def line(arr: np.ndarray) -> np.ndarray:
     kernelup = np.array([[1, 1, 1], [0, 0, 0], [-1, -1, -1]])
@@ -56,7 +68,7 @@ def main():
         image = image.resize((67, 32))
     image = np.array(image)
 
-    light = luminance(image)
+    light, colors = luminance(image)
     lines = line(light)
 
     final = light + lines
@@ -66,14 +78,16 @@ def main():
 
     out = np.vectorize(LetterPixel.get)(final)
 
-    art = "```\n"
+    art = ""
     for row in out:
         art += "".join(row) + "\n"
-    art += "```\n"
 
     with open("README.md", "w") as f:
         with open("description.md", "r") as ff:
-            f.write(ff.read() + "\n" * 10 + art)
+            f.write(ff.read() + "\n" * 10 + "```\n" + art + "```\n")
+
+    im = Visualizer.visualize(txt=out, colors=colors, fontsize=FONTSIZE)
+    im.save("out.png")
 
 if __name__ == "__main__":
     main()
