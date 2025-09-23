@@ -8,7 +8,7 @@ from PIL import Image
 from visualizer import Visualizer
 
 RESIZE = False
-FONTSIZE = 10
+FONTSIZE = 32
 LUMINANCE_FACTOR = 1.5
 
 class LetterPixel:
@@ -67,6 +67,7 @@ def main():
     if RESIZE:
         image = image.resize((67, 32))
     image = np.array(image)
+    print(f"Image shape/size is {image.shape}")
 
     light, colors = luminance(image)
     lines = line(light)
