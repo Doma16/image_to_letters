@@ -8,7 +8,7 @@ from PIL import Image
 from visualizer import Visualizer
 
 RESIZE = False
-FONTSIZE = 32
+FONTSIZE = 20
 LUMINANCE_FACTOR = 1.5
 
 class LetterPixel:
